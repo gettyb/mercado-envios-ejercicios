@@ -15,3 +15,5 @@
  - D. status: 500 body: "error: el paquete no pudo ser encontrado"
  - E. status: 500 body: "error: pk not found"
  - F. status: 200
+
+### Mejor Opción ->   C. status 404.

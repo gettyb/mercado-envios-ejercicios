@@ -6,12 +6,16 @@
 ### Opciones:
 
 - A. OPTION: /sites/:site/facilities/:facilityID/containers\
-Body: {"name": "<name>", "capacity": <nro>}
+Body: {"name": "\<name>", "capacity": \<nro>}
 - <span style="color:green">B. POST: /sites/:site/facilities/:facilityID/containers\
-Body: {"name": "<name>", "capacity": <nro>}</span>
+Body: {"name": "\<name>", "capacity": \<nro>}</span>
 - C. POST: /sites/:site/facilities/:facilityID/new_container\
-Body: {"name": "<name>", "capacity": <nro>}
+Body: {"name": "\<name>", "capacity": \<nro>}
 - D. GET: /sites/:site/facilities/:facilityID/containers/new\
-Body: {"name": "<name>", "capacity": <nro>}
-- E. GET: /sites/:site/facilities/:facilityID/containers/new?name=<name>&capacity=\<nro>
+Body: {"name": "\<name>", "capacity": \<nro>}
+- E. GET: /sites/:site/facilities/:facilityID/containers/new?name=\<name>&capacity=\<nro>
 - F. PUT: /sites/:site/facilities/:facilityID/containers
+
+### Mejor Opción ->   B.  
+POST: /sites/:site/facilities/:facilityID/containers\
+Body: {"name": "\<name>", "capacity": \<nro>}
