@@ -15,6 +15,7 @@ Una vez escaneados todos los paquetes, tocan el botón "comenzar ruta", informan
 celular y nuestro sistema. Determinar verbo http, cuerpo y URL. (omitir todo
 llamado interno del sistema)
 
+#### Respuesta:
    - Colocar en esta url [Swagger IO](https://editor.swagger.io/) el contenido de este archivo [yaml](./openapi/openapi.yaml)
 
 <p align="center"><img src="./assets/example_swagger.png" width="600"/></p>
