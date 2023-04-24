@@ -29,3 +29,5 @@ llamado interno del sistema)
    - Lo ya dibujado en los gráficos son aplicaciones que ya existen, utilícelas como caja negra de tecnología perfecta. En particular el sistema de notificaciones no hace falta que informe el destino de los mensajes, simplemente marque el uso de este, el sistema entregará las notificaciones como corresponde.
    - El JSON de la app mobile es una idea de los datos que tiene el celular al momento de iniciar la ruta, es decir, quien está logueado y que se escaneó hasta el momento. Use esos datos como desee, en el formato que desee y agregue o quite la información que crea conveniente para diseñar los endpoints
 
+[Diagrama Link](https://drive.google.com/file/d/1u8w-ngnZ1uMy-0enP9zerik__ICdkOel/view?usp=sharing)
+<p align="center"><img src="./assets/exercise1-architecture-diagram.png" width="600"/></p>
