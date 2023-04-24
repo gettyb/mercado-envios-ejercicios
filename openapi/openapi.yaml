@@ -1,0 +1,336 @@
+openapi: 3.0.3
+info:
+  title: Mercado Envíos API - Logística
+  description: Mercado Envíos API - Logística
+  version: 1.0.11
+servers:
+  - url: https://mercadoenvios.swagger.io/api/v3
+tags:
+  - name: driver
+    description: Everything about a driver
+  - name: site
+    description: Access to Dispatch sites
+paths:
+  /sites/{siteID}/shipments:
+    get:
+      tags:
+        - site
+      summary: Returns shipments pending for scanning 
+      description: Returns shipments pending for scanning at a given site and for a given driver
+      operationId: getPendingShipmentToDispatch
+      parameters:
+        - name: siteID
+          in: path
+          description: ID of site
+          required: true
+          schema:
+            type: string
+        - name: driverID
+          in: query
+          description: ID of Driver 
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AllShipmentsToDispatch'
+        '404':
+          description: Site not found
+        '400':
+          description: Invalid Driver
+          
+  /drivers/{driverID}:
+    patch:
+      tags:
+        - driver
+      summary: Update last location
+      description: Update driver's last location 
+      operationId: updateDriverLocation
+      parameters:
+        - name: driverID
+          in: path
+          description: ID of driver
+          required: true
+          schema:
+            type: string
+
+      responses:
+        '204':
+          description: Updated location 
+        '400':
+          description: Invalid status
+        '404':
+          description: Invalid Driver
+          
+  /drivers/{driverID}/routes:
+    get:
+      tags:
+        - driver
+      summary: Find routes by driver 
+      description: Returns all routes filter by status. If status query is not sended, return paginated all routes 
+      operationId: getRoutesByDriver
+      parameters:
+        - name: driverID
+          in: path
+          description: ID of driver to return
+          required: true
+          schema:
+            type: string
+        - name: status
+          in: query
+          description: route status to return
+          required: true
+          schema:
+            $ref: '#/components/schemas/RouteStatus'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Route'  
+        '400':
+          description: Invalid status
+        '404':
+          description: Invalid Driver
+
+    post:
+      tags:
+        - driver
+      summary: Start a route
+      description: 'Start route after scanning all shipments'
+      operationId: startRoute
+      parameters:
+        - name: driverID
+          in: path
+          description: ID of driver who is starting a route
+          required: true
+          schema:
+            type: string
+      responses:
+        '201':
+          description: started route
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Route' 
+  /drivers/{driverID}/routes/{routeID}:
+    patch:
+      tags:
+        - driver
+      summary: Transfer a route
+      description: 'Transfer route to another driver. This method create a virtual site asociated to this driver and pre-select(asociate) all pending shipments to a new driver'
+      operationId: transferRoute
+      parameters:
+        - name: driverID
+          in: path
+          description: ID of driver
+          required: true
+          schema:
+            type: string
+        - name: routeID
+          in: path
+          description: ID of driver who is starting a route
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransferRoute'
+            example:
+              status: TRANSFERED
+              new_driver_id: "DRV-123"
+              reason: Recibio el encargado
+      responses:
+        '200':
+          description: started route
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Route' 
+        '401':
+          description: Driver not autorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Route' 
+  /drivers/{driverID}/routes/{routeID}/shipments/{shipmentID}:
+    patch:
+      tags:
+        - driver
+      summary: Update shipment status
+      description: 'Update shipment status'
+      operationId: updateShipmentStatus
+      parameters:
+        - name: driverID
+          in: path
+          description: ID of driver
+          required: true
+          schema:
+            type: string
+        - name: routeID
+          in: path
+          description: ID of route where belong the shipment
+          required: true
+          schema:
+            type: string
+        - name: shipmentID
+          in: path
+          description: ID of shipment to be updated
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateShipment'
+            example:
+              status: DELIVERED
+              recipient_national_id: "33846879"
+              comments: Recibio el encargado
+      responses:
+        '204':
+          description: updated shipment status
+
+
+components:
+  schemas:
+    AllShipmentsToDispatch:
+      type: array
+      items:
+        $ref: '#/components/schemas/ShipmentToDispatch'
+        
+    ShipmentToDispatch:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "PKG-1234"
+        driver:
+          $ref: '#/components/schemas/Driver'
+        owner:
+          $ref: '#/components/schemas/ShipmentOwner'
+          
+    DeliveredShipment:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "PKG-1234"
+        recipient_national_id: 
+          type: string
+          example: "33846879"
+        comments: 
+          type: string
+          example: Recibio el encargado
+          
+
+    Driver:
+      type: object
+      properties:
+        id:
+          type: string
+          example: DRV-1234
+        full_name:
+          type: string
+          example: Pedro Perez
+        phone_number:
+          type: string
+          example: +5491162551055
+        last_location:
+           $ref: '#/components/schemas/Location'
+           
+    ShipmentOwner:
+      type: object
+      properties:
+        full_name:
+          type: string
+          example: Maria Lopez
+        phone_number:
+          type: string
+          example: +5491156674503
+        national_id:
+          type: string
+          example: "33846879"
+        address_location:
+           $ref: '#/components/schemas/Location'
+        address_references:
+           type: string
+           example: Entre calles moldes y vidal
+
+    Route:
+      type: object
+      properties:
+        route:
+          type: object
+          properties:
+            id: 
+              type: string
+              example: "123456"
+            status: 
+              $ref: '#/components/schemas/RouteStatus'
+            next_shipment_to_dispatch:
+              $ref: '#/components/schemas/ShipmentToDispatch'
+            all_delivered_shipments:
+              type: array
+              items:
+                $ref: '#/components/schemas/DeliveredShipment'    
+              
+          
+    UpdateShipment:
+      type: object
+      properties:
+        status:
+          type: string
+          default: DELIVERED
+          enum:
+            - DELIVERED
+            - FAILED_DELIVERY
+        recipient_national_id:
+          type: string
+          example: "33846879"
+          
+        comments:
+          type: string
+          
+    TransferRoute:
+      type: object
+      properties:
+        status:
+          type: string
+          default: TRANSFERED
+          enum:
+            - TRANSFERED
+        new_driver_id:
+          type: string
+          example: "DRV-123"
+        reason:
+          type: string
+          example: Camion accidentado
+          
+    RouteStatus:
+      type: string
+      enum:
+        - STARTED
+        - TRANSFERED
+        - COMPLETED
+        
+    Location:
+      type: object
+      properties:
+        lat:
+          type: number
+          
+          example: 37.421875199999995
+        lng:
+          type: number
+          example: -122.0851173
